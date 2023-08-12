@@ -21,16 +21,16 @@ class Race
     #[Assert\NotBlank]
     public string $name = '';
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    #[Assert\DateTime]
+    #[ORM\Column(type: 'date_immutable')]
+    #[Assert\Type(\DateTimeImmutable::class)]
     private \DateTimeImmutable $date;
 
     #[ORM\Column(type: 'time_immutable', nullable: true)]
-    #[Assert\DateTime]
+    #[Assert\Type(\DateTimeImmutable::class)]
     private ?\DateTimeImmutable $averageFinishMedium;
 
     #[ORM\Column(type: 'time_immutable', nullable: true)]
-    #[Assert\DateTime]
+    #[Assert\Type(\DateTimeImmutable::class)]
     private ?\DateTimeImmutable $averageFinishLong;
 
     public function getId(): ?int

@@ -36,6 +36,7 @@ class Result
     public string $distance;
 
     #[ORM\Column(type: 'time_immutable')]
+    #[Assert\Type(\DateTimeImmutable::class)]
     private \DateTimeImmutable $time;
 
     #[ORM\Column(type: 'string')]
