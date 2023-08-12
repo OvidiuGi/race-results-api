@@ -20,6 +20,7 @@
         "symfony/expression-language": "6.3.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.3.*",
+        "symfony/monolog-bundle": "^3.0",
         "symfony/property-access": "6.3.*",
         "symfony/property-info": "6.3.*",
         "symfony/runtime": "6.3.*",
@@ -76,5 +77,10 @@
             "allow-contrib": false,
             "require": "6.3.*"
         }
+    },
+    "require-dev": {
+        "symfony/debug-bundle": "6.3.*",
+        "symfony/stopwatch": "6.3.*",
+        "symfony/web-profiler-bundle": "6.3.*"
     }
 }
