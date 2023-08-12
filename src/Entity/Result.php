@@ -31,9 +31,9 @@ class Result
     public string $fullName = '';
 
     #[ORM\Column(type: 'string')]
-    #[Assert\Choice(choices: [self::DISTANCES])]
+    #[Assert\Choice(choices: self::DISTANCES)]
     #[Assert\NotBlank]
-    public string $distance;
+    public string $distance = '';
 
     #[ORM\Column(type: 'time_immutable')]
     #[Assert\Type(\DateTimeImmutable::class)]
