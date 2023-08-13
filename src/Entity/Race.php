@@ -4,12 +4,36 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Post;
+use App\Controller\ImportRaceResults;
 use App\Repository\RaceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RaceRepository::class)]
 #[ORM\Table(name: 'race')]
+#[
+    ApiResource(
+        operations: [
+            new GetCollection()
+        ]
+    ),
+    ApiFilter(
+        OrderFilter::class,
+        properties: [
+            'name',
+            'date',
+            'averageFinishMedium',
+            'averageFinishLong'
+        ]
+    )
+]
 class Race
 {
     #[ORM\Id]
@@ -19,7 +43,7 @@ class Race
 
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank]
-    public string $name = '';
+    public string $title = '';
 
     #[ORM\Column(type: 'date_immutable')]
     #[Assert\Type(\DateTimeImmutable::class)]
