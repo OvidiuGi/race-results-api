@@ -7,11 +7,8 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use App\Controller\ImportRaceResults;
 use App\Repository\RaceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -41,7 +38,7 @@ class Race
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string')]
+    #[ORM\Column(type: 'string',unique: true)]
     #[Assert\NotBlank]
     public string $title = '';
 
@@ -96,5 +93,14 @@ class Race
     public function getAverageFinishLong(): ?\DateTimeImmutable
     {
         return $this->averageFinishLong;
+    }
+
+    public static function createFromArray(array $data): self
+    {
+        $race = new self();
+        $race->title = $data['title'];
+        $race->date = $data['date'];
+
+        return $race;
     }
 }

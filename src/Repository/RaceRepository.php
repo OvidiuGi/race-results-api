@@ -19,4 +19,13 @@ class RaceRepository extends ServiceEntityRepository
 
         parent::__construct($registry, Race::class);
     }
+
+    public function save(Race $race, $flush = false): void
+    {
+        $this->entityManager->persist($race);
+
+        if ($flush) {
+            $this->entityManager->flush();
+        }
+    }
 }

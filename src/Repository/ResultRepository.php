@@ -19,4 +19,24 @@ class ResultRepository extends ServiceEntityRepository
 
         parent::__construct($registry, Result::class);
     }
+
+    public function save(Result $result, $flush = false): void
+    {
+        $this->entityManager->persist($result);
+
+        if ($flush) {
+            $this->entityManager->flush();
+        }
+    }
+
+    public function saveAll(array $results, $flush = false): void
+    {
+        foreach ($results as $result) {
+            $this->save($result);
+        }
+
+        if ($flush) {
+            $this->entityManager->flush();
+        }
+    }
 }

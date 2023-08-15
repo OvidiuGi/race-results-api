@@ -73,8 +73,7 @@ class Result
     public string $fullName = '';
 
     #[ORM\Column(type: 'string')]
-    #[Assert\Choice(choices: self::DISTANCES)]
-    #[Assert\NotBlank]
+    #[Assert\Choice(choices: self::DISTANCES), Assert\NotBlank]
     #[Groups(['edit'])]
     public string $distance = '';
 
@@ -128,5 +127,20 @@ class Result
     public function getRace(): Race
     {
         return $this->race;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public static function createFromArray(array $data): self
+    {
+        $result = new self();
+
+        $result->fullName = $data['fullName'];
+        $result->distance = $data['distance'];
+        $result->finishTime = new \DateTimeImmutable($data['finishTime']);
+        $result->ageCategory = $data['ageCategory'];
+
+        return $result;
     }
 }
