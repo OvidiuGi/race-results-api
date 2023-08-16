@@ -7,11 +7,10 @@ namespace App\Importer;
 use ApiPlatform\Validator\ValidatorInterface;
 use App\Entity\Race;
 use App\Repository\RaceRepository;
-use App\Repository\ResultRepository;
 use App\Service\DataMapper\DataMapperInterface;
 use App\Service\DataProcessor\DataProcessorInterface;
 use App\Service\ResultCalculationService;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -19,15 +18,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RaceResultsImporter implements ImporterInterface
 {
     public function __construct(
-        private DataProcessorInterface   $csvDataProcessor,
-        private DataMapperInterface      $resultDataMapper,
-        private ResultRepository         $resultRepository,
-        private RaceRepository           $raceRepository,
-        private ValidatorInterface       $validator,
+        private DataProcessorInterface $csvDataProcessor,
+        private DataMapperInterface $resultDataMapper,
+        private RaceRepository $raceRepository,
+        private ValidatorInterface $validator,
         private ResultCalculationService $resultCalculationService,
         private SerializerInterface $serializer,
-        public array                     $data = []
-    ) {}
+        public array $data = []
+    ) {
+    }
 
     public function setAdditionalData(array $data): self
     {
@@ -36,12 +35,16 @@ class RaceResultsImporter implements ImporterInterface
         return $this;
     }
 
-    public function import(File $file): string
+    public function import(array $data): Response
     {
-        $race = $this->data['race'];
+        $race = Race::createFromDto($data['raceDto']);
 
-        $processedData = $this->csvDataProcessor->process($file);
+        $processedData = $this->csvDataProcessor->process($data['file']);
         $mappedData = $this->resultDataMapper->map($processedData);
+
+        foreach ($mappedData as $result) {
+            $race->addResult($result);
+        }
 
         $this->validator->validate($race);
         foreach ($mappedData as $result) {
@@ -52,14 +55,9 @@ class RaceResultsImporter implements ImporterInterface
         $this->resultCalculationService->setAverageFinishTime($race);
         $this->raceRepository->save($race, true);
 
-        foreach ($mappedData as $result) {
-            $result->setRace($race);
-        }
-        $this->resultRepository->saveAll($mappedData, true);
-
-        return $this->serializer->serialize([$race, $mappedData], 'json', [
+        return new Response($this->serializer->serialize([$race, $mappedData], 'json', [
             DateTimeNormalizer::FORMAT_KEY => 'Y-m-d\TH:i:s.u\Z',
             JsonEncode::OPTIONS => JSON_PRETTY_PRINT
-        ]);
+        ]));
     }
 }

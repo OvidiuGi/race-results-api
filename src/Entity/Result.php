@@ -95,10 +95,10 @@ class Result
     #[Assert\Positive]
     public ?int $ageCategoryPlacement = null;
 
-    #[ORM\ManyToOne(targetEntity: Race::class)]
+    #[ORM\ManyToOne(targetEntity: Race::class, inversedBy: 'results')]
     #[ORM\JoinColumn(name: 'race_id', referencedColumnName: 'id')]
     #[Groups('edit')]
-    private Race $race;
+    private ?Race $race;
 
     public function getId(): ?int
     {
@@ -117,14 +117,14 @@ class Result
         return $this->finishTime;
     }
 
-    public function setRace(Race $race): self
+    public function setRace(?Race $race): self
     {
         $this->race = $race;
 
         return $this;
     }
 
-    public function getRace(): Race
+    public function getRace(): ?Race
     {
         return $this->race;
     }

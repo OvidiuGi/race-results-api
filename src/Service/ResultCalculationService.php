@@ -12,17 +12,16 @@ class ResultCalculationService
     public function __construct(
         public array $resultsWithPlacement = [],
         public array $resultsWithoutPlacement = []
-    ) {}
+    ) {
+    }
 
     private function filterData(array $data): self
     {
         $this->resultsWithPlacement = array_filter($data, fn($result) =>
-            $result->distance === Result::DISTANCE_LONG
-        );
+            $result->distance === Result::DISTANCE_LONG);
 
         $this->resultsWithoutPlacement = array_filter($data, fn($result) =>
-            $result->distance === Result::DISTANCE_MEDIUM
-        );
+            $result->distance === Result::DISTANCE_MEDIUM);
 
         return $this;
     }
@@ -34,8 +33,7 @@ class ResultCalculationService
         $resultsWithAgeCategory = [];
         $this->calculateOverallPlacement($this->resultsWithPlacement);
 
-        foreach($this->resultsWithPlacement as $result)
-        {
+        foreach ($this->resultsWithPlacement as $result) {
             $resultsWithAgeCategory[$result->ageCategory][] = $result;
         }
 
@@ -49,7 +47,7 @@ class ResultCalculationService
         uasort($data, fn($a, $b) => $a->getFinishTime() <=> $b->getFinishTime());
 
         $placement = 1;
-        foreach($data as $datum) {
+        foreach ($data as $datum) {
             $datum->overallPlacement = $placement;
             $placement++;
         }
@@ -60,7 +58,7 @@ class ResultCalculationService
         uasort($data, fn($a, $b) => $a->getFinishTime() <=> $b->getFinishTime());
 
         $placement = 1;
-        foreach($data as $datum) {
+        foreach ($data as $datum) {
             $datum->ageCategoryPlacement = $placement;
             $placement++;
         }
@@ -76,8 +74,7 @@ class ResultCalculationService
     {
         $result = 0;
 
-        foreach ($data as $object)
-        {
+        foreach ($data as $object) {
             $result += $object->getFinishTime()->getTimestamp();
         }
 

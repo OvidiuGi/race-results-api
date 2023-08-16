@@ -40,11 +40,11 @@ class OpenApiFactory implements OpenApiFactoryInterface
                                             'schema' => [
                                                 'type' => 'object',
                                                 'properties' => [
-                                                    'raceTitle' => [
+                                                    'title' => [
                                                         'type' => 'string',
                                                         'example' => 'Race 1'
                                                     ],
-                                                    'raceDate' => [
+                                                    'date' => [
                                                         'type' => 'string',
                                                         'format' => 'date-time',
                                                         'example' => '2021-01-01T00:00:00+00:00'
@@ -57,8 +57,8 @@ class OpenApiFactory implements OpenApiFactoryInterface
                                                     ],
                                                 ],
                                                 'required' => [
-                                                    'raceTitle',
-                                                    'raceDate',
+                                                    'title',
+                                                    'date',
                                                     'file'
                                                 ],
                                             ],

@@ -15,6 +15,7 @@ class CsvDataProcessor implements DataProcessorInterface
         $file = Reader::createFromFileObject($file->openFile());
         $file->setHeaderOffset(0);
         $header = $file->getHeader();
+
         foreach ($file->getRecords() as $record) {
             $processedData[] = array_combine($header, $record);
         }

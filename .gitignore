@@ -17,3 +17,10 @@
 /phpunit.xml
 
 /.idea/
+
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###
+
+/phpcs.xml.dist

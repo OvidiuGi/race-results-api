@@ -6,10 +6,11 @@ namespace App\Importer;
 
 use App\Entity\Race;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Response;
 
 interface ImporterInterface
 {
-    public function import(File $file): string;
+    public function import(array $data): Response;
 
     public function setAdditionalData(array $data): self;
 }

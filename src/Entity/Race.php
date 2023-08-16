@@ -9,8 +9,13 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use App\Controller\ImportAction;
+use App\Dto\RaceDto;
 use App\Repository\RaceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RaceRepository::class)]
@@ -31,6 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ]
     )
 ]
+#[UniqueEntity(fields: ['title', 'date'], message: 'A race with this title and date already exists!')]
 class Race
 {
     #[ORM\Id]
@@ -38,7 +44,7 @@ class Race
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string',unique: true)]
+    #[ORM\Column(type: 'string', unique: true)]
     #[Assert\NotBlank]
     public string $title = '';
 
@@ -53,6 +59,15 @@ class Race
     #[ORM\Column(type: 'time_immutable', nullable: true)]
     #[Assert\Type(\DateTimeImmutable::class)]
     private ?\DateTimeImmutable $averageFinishLong;
+
+    #[ORM\OneToMany(mappedBy: 'race', targetEntity: Result::class, cascade: ['persist', 'remove'])]
+    #[Assert\Valid]
+    private Collection $results;
+
+    public function __construct()
+    {
+        $this->results = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -95,11 +110,28 @@ class Race
         return $this->averageFinishLong;
     }
 
-    public static function createFromArray(array $data): self
+    public function addResult(Result $result): void
+    {
+        if ($this->results->contains($result)) {
+            return;
+        }
+
+        $this->results->add($result);
+        $result->setRace($this);
+    }
+
+    public function removeResult(Result $result): void
+    {
+        $this->results->removeElement($result);
+        $result->setRace(null);
+    }
+
+    public static function createFromDto(RaceDto $dto): self
     {
         $race = new self();
-        $race->title = $data['title'];
-        $race->date = $data['date'];
+
+        $race->title = $dto->title;
+        $race->date = $dto->getDate();
 
         return $race;
     }
