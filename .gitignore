@@ -24,3 +24,5 @@
 ###< squizlabs/php_codesniffer ###
 
 /phpcs.xml.dist
+
+/phpstan.neon

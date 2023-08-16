@@ -26,7 +26,7 @@ class ResultCalculationService
         return $this;
     }
 
-    public function calculatePlacements(array &$data): void
+    public function calculatePlacements(array $data): void
     {
         $this->filterData($data);
 

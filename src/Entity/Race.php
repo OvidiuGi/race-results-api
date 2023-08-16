@@ -8,8 +8,6 @@ use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use App\Controller\ImportAction;
 use App\Dto\RaceDto;
 use App\Repository\RaceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
