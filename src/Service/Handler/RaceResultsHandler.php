@@ -18,12 +18,13 @@ class RaceResultsHandler
     ) {
     }
 
+    /**
+     * @throws DuplicateRaceException
+     * @throws RaceResultHandlingException
+     */
     public function handle(array $data): Response
     {
-        $race = $this->raceRepository->findOneBy([
-            'title' => $data['raceDto']->title,
-            'date' => $data['raceDto']->getDate()
-        ]);
+        $race = $this->raceRepository->findByRaceDto($data['raceDto']);
 
         if ($race) {
             throw new DuplicateRaceException($race->title, $race->getDate());

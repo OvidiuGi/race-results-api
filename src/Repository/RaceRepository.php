@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\RaceDto;
 use App\Entity\Race;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,5 +26,13 @@ class RaceRepository extends ServiceEntityRepository
         if ($flush) {
             $this->entityManager->flush();
         }
+    }
+
+    public function findByRaceDto(RaceDto $raceDto): null|object
+    {
+        return $this->findOneBy([
+            'title' => $raceDto->title,
+            'date' => $raceDto->getDate(),
+        ]);
     }
 }

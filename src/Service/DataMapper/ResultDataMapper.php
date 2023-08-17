@@ -10,7 +10,7 @@ use App\Entity\Result;
 class ResultDataMapper implements DataMapperInterface
 {
     public function __construct(
-        private array $data = [],
+        private array $context = [],
         private array $resultsWithPlacement = [],
         private array $resultsWithoutPlacement = [],
         private array $resultsWithAgeCategory = [],
@@ -20,11 +20,11 @@ class ResultDataMapper implements DataMapperInterface
 
     public function map(array $data): self
     {
-        $this->data['race'] = $data['race'];
+        $this->context['race'] = $data['race'];
 
         foreach ($data['processedData'] as $item) {
             $result = Result::createFromArray($item);
-            $result->setRace($this->data['race']);
+            $result->setRace($this->context['race']);
             $this->rowCount++;
 
             if ($result->distance === Result::DISTANCE_LONG) {
@@ -60,7 +60,7 @@ class ResultDataMapper implements DataMapperInterface
 
     public function getRace(): Race
     {
-        return $this->data['race'];
+        return $this->context['race'];
     }
 
     public function getRowCount(): int
