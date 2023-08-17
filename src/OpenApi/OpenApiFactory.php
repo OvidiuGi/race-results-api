@@ -16,8 +16,9 @@ use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 #[AsDecorator(decorates: 'api_platform.openapi.factory')]
 class OpenApiFactory implements OpenApiFactoryInterface
 {
-    public function __construct(private readonly OpenApiFactoryInterface $decorated)
-    {
+    public function __construct(
+        private readonly OpenApiFactoryInterface $decorated
+    ) {
     }
 
     public function __invoke(array $context = []): OpenApi

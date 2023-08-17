@@ -11,6 +11,4 @@ use Symfony\Component\HttpFoundation\Response;
 interface ImporterInterface
 {
     public function import(array $data): Response;
-
-    public function setAdditionalData(array $data): self;
 }

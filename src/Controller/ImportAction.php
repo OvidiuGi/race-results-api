@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ImportAction extends AbstractController
 {
     public function __construct(
-        private RaceResultsHandler $raceResultsHandler
+        private readonly RaceResultsHandler $raceResultsHandler
     ) {
     }
 

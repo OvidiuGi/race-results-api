@@ -17,6 +17,7 @@ class CsvDataProcessor implements DataProcessorInterface
         $header = $file->getHeader();
 
         foreach ($file->getRecords() as $record) {
+            // validare date
             $processedData[] = array_combine($header, $record);
         }
 

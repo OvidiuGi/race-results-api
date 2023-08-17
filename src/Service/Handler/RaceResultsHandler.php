@@ -13,8 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 class RaceResultsHandler
 {
     public function __construct(
-        private RaceRepository $raceRepository,
-        private ImporterInterface $raceResultsImporter
+        private readonly RaceRepository $raceRepository,
+        private readonly ImporterInterface $raceResultsImporter
     ) {
     }
 

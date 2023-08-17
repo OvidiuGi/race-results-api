@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: RaceRepository::class)]
+#[ORM\Entity(repositoryClass: RaceRepository::class, readOnly: true)]
 #[ORM\Table(name: 'race')]
 #[
     ApiResource(
@@ -42,7 +42,7 @@ class Race
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', unique: true)]
+    #[ORM\Column(type: 'string')]
     #[Assert\NotBlank]
     public string $title = '';
 
@@ -57,15 +57,6 @@ class Race
     #[ORM\Column(type: 'time_immutable', nullable: true)]
     #[Assert\Type(\DateTimeImmutable::class)]
     private ?\DateTimeImmutable $averageFinishLong;
-
-    #[ORM\OneToMany(mappedBy: 'race', targetEntity: Result::class, cascade: ['persist', 'remove'])]
-    #[Assert\Valid]
-    private Collection $results;
-
-    public function __construct()
-    {
-        $this->results = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -106,22 +97,6 @@ class Race
     public function getAverageFinishLong(): ?\DateTimeImmutable
     {
         return $this->averageFinishLong;
-    }
-
-    public function addResult(Result $result): void
-    {
-        if ($this->results->contains($result)) {
-            return;
-        }
-
-        $this->results->add($result);
-        $result->setRace($this);
-    }
-
-    public function removeResult(Result $result): void
-    {
-        $this->results->removeElement($result);
-        $result->setRace(null);
     }
 
     public static function createFromDto(RaceDto $dto): self

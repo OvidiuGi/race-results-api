@@ -95,7 +95,7 @@ class Result
     #[Assert\Positive]
     public ?int $ageCategoryPlacement = null;
 
-    #[ORM\ManyToOne(targetEntity: Race::class, inversedBy: 'results')]
+    #[ORM\ManyToOne(targetEntity: Race::class)]
     #[ORM\JoinColumn(name: 'race_id', referencedColumnName: 'id')]
     #[Groups('edit')]
     private ?Race $race;

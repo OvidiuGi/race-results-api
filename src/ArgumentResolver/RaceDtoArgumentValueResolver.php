@@ -6,14 +6,14 @@ namespace App\ArgumentResolver;
 
 use App\Dto\RaceDto;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class RaceDtoArgumentValueResolver implements ArgumentValueResolverInterface
+class RaceDtoArgumentValueResolver implements ValueResolverInterface
 {
     public function __construct(
-        private SerializerInterface $serializer
+        private readonly SerializerInterface $serializer
     ) {
     }
 

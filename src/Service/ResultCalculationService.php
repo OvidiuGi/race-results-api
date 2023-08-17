@@ -4,70 +4,72 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\Race;
-use App\Entity\Result;
+use App\Service\DataMapper\DataMapperInterface;
+use App\Service\DataMapper\ResultDataMapper;
 
 class ResultCalculationService
 {
     public function __construct(
-        public array $resultsWithPlacement = [],
-        public array $resultsWithoutPlacement = []
+        private ResultDataMapper $dataMapper
     ) {
     }
 
-    private function filterData(array $data): self
+    public function setDataMapper(DataMapperInterface $dataMapper): self
     {
-        $this->resultsWithPlacement = array_filter($data, fn($result) =>
-            $result->distance === Result::DISTANCE_LONG);
-
-        $this->resultsWithoutPlacement = array_filter($data, fn($result) =>
-            $result->distance === Result::DISTANCE_MEDIUM);
+        $this->dataMapper = $dataMapper;
 
         return $this;
     }
 
-    public function calculatePlacements(array $data): void
+    public function calculatePlacements(): void
     {
-        $this->filterData($data);
+        $this->calculatePlacement(
+            $this->dataMapper->getResultsWithPlacements(),
+            'overallPlacement'
+        );
 
-        $resultsWithAgeCategory = [];
-        $this->calculateOverallPlacement($this->resultsWithPlacement);
+        $this->calculatePlacementAgeCategory(
+            $this->dataMapper->getResultsWithAgeCategory()
+        );
+    }
 
-        foreach ($this->resultsWithPlacement as $result) {
-            $resultsWithAgeCategory[$result->ageCategory][] = $result;
-        }
-
-        foreach ($resultsWithAgeCategory as $ageCategory => $results) {
-            $this->calculateAgeCategoryPlacement($results);
+    public function calculatePlacementAgeCategory(array $data): void
+    {
+        foreach ($data as $ageCategory => $results) {
+            $this->calculatePlacement($results, 'ageCategoryPlacement');
         }
     }
 
-    private function calculateOverallPlacement(array &$data): void
+    public function calculatePlacement(array $data, string $context): void
     {
         uasort($data, fn($a, $b) => $a->getFinishTime() <=> $b->getFinishTime());
 
         $placement = 1;
         foreach ($data as $datum) {
-            $datum->overallPlacement = $placement;
+            $datum->{$context} = $placement;
             $placement++;
         }
     }
 
-    private function calculateAgeCategoryPlacement(array &$data): void
+    public function setAverageFinishTime(): void
     {
-        uasort($data, fn($a, $b) => $a->getFinishTime() <=> $b->getFinishTime());
+        $this
+            ->dataMapper
+            ->getRace()
+            ->setAverageFinishMedium(
+                $this->calculateAverageFinishTime(
+                    $this->dataMapper->getResultsWithoutPlacements()
+                )
+            );
 
-        $placement = 1;
-        foreach ($data as $datum) {
-            $datum->ageCategoryPlacement = $placement;
-            $placement++;
-        }
-    }
-
-    public function setAverageFinishTime(Race $race): void
-    {
-        $race->setAverageFinishMedium($this->calculateAverageFinishTime($this->resultsWithoutPlacement));
-        $race->setAverageFinishLong($this->calculateAverageFInishTime($this->resultsWithPlacement));
+        $this
+            ->dataMapper
+            ->getRace()
+            ->setAverageFinishLong(
+                $this->calculateAverageFinishTime(
+                    $this->dataMapper->getResultsWithPlacements()
+                )
+            );
     }
 
     private function calculateAverageFinishTime(array $data): \DateTimeImmutable

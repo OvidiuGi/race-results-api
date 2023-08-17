@@ -6,5 +6,8 @@ namespace App\Service\DataMapper;
 
 interface DataMapperInterface
 {
-    public function map(array $data): array;
+    public function getData(): array;
+    public function map(array $data): self;
+
+    public function getRowCount(): int;
 }
