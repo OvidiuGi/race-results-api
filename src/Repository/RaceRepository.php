@@ -12,10 +12,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class RaceRepository extends ServiceEntityRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        private readonly EntityManagerInterface $entityManager
-    ) {
+    public function __construct(ManagerRegistry $registry, private readonly EntityManagerInterface $entityManager)
+    {
         parent::__construct($registry, Race::class);
     }
 

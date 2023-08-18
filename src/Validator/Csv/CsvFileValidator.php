@@ -10,9 +10,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class CsvFileValidator extends AbstractFileValidator
 {
-    public function __construct(
-        readonly ValidatorInterface $validator
-    ) {
+    public function __construct(readonly ValidatorInterface $validator)
+    {
         $this->rowConstraints = new Assert\Collection([
             'fullName' => new Assert\NotBlank(),
             'distance' => new Assert\Choice(options: Result::DISTANCES),

@@ -16,19 +16,16 @@ use Symfony\Component\Routing\Annotation\Route;
 #[AsController]
 class ImportAction extends AbstractController
 {
-    public function __construct(
-        private readonly RaceResultsHandler $raceResultsHandler
-    ) {
+    public function __construct(private readonly RaceResultsHandler $raceResultsHandler)
+    {
     }
 
     /**
      * @throws \Exception
      */
     #[Route(path: '/import', methods: ['POST'])]
-    public function __invoke(
-        #[MapRequestPayload] RaceDto $raceDto,
-        Request $request
-    ): Response {
+    public function __invoke(#[MapRequestPayload] RaceDto $raceDto, Request $request): Response
+    {
         $file = $request->files->get('file');
 
         try {

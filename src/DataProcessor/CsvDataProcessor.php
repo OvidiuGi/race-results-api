@@ -11,9 +11,8 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class CsvDataProcessor implements DataProcessorInterface
 {
-    public function __construct(
-        private CsvFileValidator $csvFileValidator
-    ) {
+    public function __construct(private CsvFileValidator $csvFileValidator)
+    {
     }
 
     /**

@@ -9,9 +9,8 @@ use App\DataMapper\ResultDataMapper;
 
 class ResultCalculationService
 {
-    public function __construct(
-        private ResultDataMapper $dataMapper
-    ) {
+    public function __construct(private ResultDataMapper $dataMapper)
+    {
     }
 
     public function setDataMapper(DataMapperInterface $dataMapper): self
