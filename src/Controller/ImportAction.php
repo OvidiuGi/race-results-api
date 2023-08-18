@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\Routing\Annotation\Route;
 
 #[AsController]
 class ImportAction extends AbstractController
@@ -27,7 +26,6 @@ class ImportAction extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route(path: '/import', methods: ['POST'])]
     public function __invoke(#[MapRequestPayload] RaceDto $raceDto, Request $request): Response
     {
         $file = $request->files->get('file');

@@ -8,12 +8,15 @@ use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
+use App\Controller\ImportAction;
 use App\Dto\RaceDto;
 use App\Repository\RaceRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\OpenApi\Model;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RaceRepository::class, readOnly: true)]
@@ -21,8 +24,58 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[
     ApiResource(
         operations: [
-            new GetCollection()
-        ]
+            new GetCollection(),
+            new Post(
+                controller: ImportAction::class,
+                openapi: new Model\Operation(
+                    responses: [
+                        200 =>
+                            new OpenApiResponse(
+                                description: 'Imported results',
+                                content: new \ArrayObject([
+                                    'application/json' => [
+                                        'schema' => [
+                                            'type' => 'string',
+                                            'example' => 'Imported 100 results',
+                                        ],
+                                    ],
+                                ])
+                            ),
+                    ],
+                    summary: 'Create a Race resource and import results from a CSV file',
+                    description: 'Create a Race resource and import results from a CSV file',
+                    requestBody: new Model\RequestBody(
+                        content: new \ArrayObject([
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'title' => [
+                                            'type' => 'string',
+                                            'example' => 'Race 1'
+                                        ],
+                                        'date' => [
+                                            'type' => 'string',
+                                            'format' => 'date-time',
+                                            'example' => '2021-01-01T00:00:00+00:00'
+                                        ],
+                                        'file' => [
+                                            'type' => 'string',
+                                            'format' => 'binary',
+                                            'description' => 'Upload the CSV file',
+                                            'example' => 'import.csv'
+                                        ],
+                                    ]
+                                ]
+                            ]
+                        ])
+                    )
+                ),
+                validationContext: ['groups' => ['import']],
+                deserialize: false,
+                name: 'import',
+            )
+        ],
     ),
     ApiFilter(
         OrderFilter::class,
@@ -57,6 +110,9 @@ class Race
     #[ORM\Column(type: 'time_immutable', nullable: true)]
     #[Assert\Type(\DateTimeImmutable::class)]
     private ?\DateTimeImmutable $averageFinishLong;
+
+    #[Assert\NotNull(groups: ['import'])]
+    public ?File $resultsFile = null;
 
     public function getId(): ?int
     {
