@@ -71,7 +71,6 @@ use Symfony\Component\Validator\Constraints as Assert;
                         ])
                     )
                 ),
-                validationContext: ['groups' => ['import']],
                 deserialize: false,
                 name: 'import',
             )
@@ -110,9 +109,6 @@ class Race
     #[ORM\Column(type: 'time_immutable', nullable: true)]
     #[Assert\Type(\DateTimeImmutable::class)]
     private ?\DateTimeImmutable $averageFinishLong;
-
-    #[Assert\NotNull(groups: ['import'])]
-    public ?File $resultsFile = null;
 
     public function getId(): ?int
     {
