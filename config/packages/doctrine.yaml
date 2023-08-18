@@ -1,7 +1,6 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
-        logging: false
         profiling: false
 
         profiling_collect_backtrace: '%kernel.debug%'

@@ -8,6 +8,7 @@ use App\Dto\RaceDto;
 use App\Exception\DuplicateRaceException;
 use App\Importer\RaceResultsImporter;
 use App\Repository\RaceRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,8 @@ class ImportAction extends AbstractController
 {
     public function __construct(
         private readonly RaceRepository $raceRepository,
-        private readonly RaceResultsImporter $raceResultsImporter
+        private readonly RaceResultsImporter $raceResultsImporter,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -37,6 +39,11 @@ class ImportAction extends AbstractController
             ]);
 
             if ($race != null) {
+                $this->logger->info('Duplicate Race import attempt', [
+                    'title' => $race->title,
+                    'date' => $race->getDate(),
+                ]);
+
                 throw new DuplicateRaceException($race->title, $race->getDate());
             }
 

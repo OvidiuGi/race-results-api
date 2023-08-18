@@ -6,65 +6,33 @@ namespace App\DataMapper;
 
 use App\Entity\Race;
 use App\Entity\Result;
+use App\Repository\ResultRepository;
+use App\Validator\Csv\CsvFileValidator;
 
 class ResultDataMapper implements DataMapperInterface
 {
     public function __construct(
-        private array $context = [],
-        private array $resultsWithPlacement = [],
-        private array $resultsWithoutPlacement = [],
-        private array $resultsWithAgeCategory = [],
-        private int $rowCount = 0
+        private readonly int $batchSize,
+        private readonly ResultRepository $resultRepository,
+        private readonly CsvFileValidator $csvFileValidator
     ) {
     }
 
-    public function map(array $data): self
+    public function mapRecord(Race &$race, array $record, int $rowNumber, array &$invalidRows): int
     {
-        $this->context['race'] = $data['race'];
-
-        foreach ($data['processedData'] as $item) {
-            $result = Result::createFromArray($item);
-            $result->setRace($this->context['race']);
-            $this->rowCount++;
-
-            if ($result->distance === Result::DISTANCE_LONG) {
-                $this->resultsWithPlacement[] = $result;
-                $this->resultsWithAgeCategory[$result->ageCategory][] = $result;
-            } else {
-                $this->resultsWithoutPlacement[] = $result;
-            }
+        if (!$this->csvFileValidator->validateRow($record, $rowNumber)) {
+            $invalidRows[] = $rowNumber;
+            return ++$rowNumber;
         }
 
-        return $this;
-    }
+        $result = Result::createFromArray($record);
+        $result->setRace($race);
+        $this->resultRepository->save($result);
 
-    public function getData(): array
-    {
-        return array_merge($this->resultsWithPlacement, $this->resultsWithoutPlacement);
-    }
+        if (($rowNumber % $this->batchSize) === 0) {
+            $this->resultRepository->flushAndClear($race);
+        }
 
-    public function getResultsWithPlacements(): array
-    {
-        return $this->resultsWithPlacement;
-    }
-
-    public function getResultsWithAgeCategory(): array
-    {
-        return $this->resultsWithAgeCategory;
-    }
-
-    public function getResultsWithoutPlacements(): array
-    {
-        return $this->resultsWithoutPlacement;
-    }
-
-    public function getRace(): Race
-    {
-        return $this->context['race'];
-    }
-
-    public function getRowCount(): int
-    {
-        return $this->rowCount;
+        return ++$rowNumber;
     }
 }

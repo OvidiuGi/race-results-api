@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\DataMapper;
 
+use App\Entity\Race;
+
 interface DataMapperInterface
 {
-    public function getData(): array;
-    public function map(array $data): self;
-
-    public function getRowCount(): int;
+    public function mapRecord(Race &$race, array $record, int $rowNumber, array &$invalidRows): int;
 }

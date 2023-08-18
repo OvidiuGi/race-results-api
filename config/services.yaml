@@ -1,10 +1,11 @@
 parameters:
-    debug.container.dump: false
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
+        bind:
+            $batchSize: '%env(BATCH_SIZE)%'
 
     App\:
         resource: '../src/'

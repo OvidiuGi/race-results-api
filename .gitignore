@@ -18,6 +18,7 @@
 
 /.idea/
 
+/.DS_Store
 ###> squizlabs/php_codesniffer ###
 /.phpcs-cache
 /phpcs.xml

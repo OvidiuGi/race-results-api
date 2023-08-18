@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Importer;
 
-use App\DataMapper\DataMapperInterface;
-use App\DataProcessor\DataProcessorInterface;
+use App\AverageFinishTimeService;
+use App\DataMapper\ResultDataMapper;
 use App\Entity\Race;
 use App\Repository\RaceRepository;
 use App\Repository\ResultRepository;
 use App\ResultCalculationService;
+use App\Validator\Csv\CsvFileValidator;
+use League\Csv\Exception;
+use League\Csv\Reader;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -18,37 +21,66 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RaceResultsImporter implements ImporterInterface
 {
     public function __construct(
-        private readonly DataProcessorInterface $csvDataProcessor,
-        private readonly DataMapperInterface $resultDataMapper,
-        private readonly ResultCalculationService $resultCalculationService,
         private readonly SerializerInterface $serializer,
         private readonly ResultRepository $resultRepository,
-        private readonly RaceRepository $raceRepository
+        private readonly RaceRepository $raceRepository,
+        private readonly CsvFileValidator $csvFileValidator,
+        private readonly AverageFinishTimeService $averageFinishTimeService,
+        private readonly ResultCalculationService $resultCalculationService,
+        private readonly ResultDataMapper $resultDataMapper
     ) {
     }
 
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
     public function import(array $data): Response
     {
         $race = Race::createFromDto($data['raceDto']);
-
-        $processedData = $this->csvDataProcessor->process($data['file']);
-        $mappedData = $this->resultDataMapper->map(['processedData' => $processedData, 'race' => $race]);
-
-        $this->resultCalculationService->setDataMapper($mappedData);
-        $this->resultCalculationService->calculatePlacements();
-        $this->resultCalculationService->setAverageFinishTime();
-
         $this->raceRepository->save($race, true);
-        $this->resultRepository->saveBulk($mappedData->getRace(), $mappedData->getData());
+
+        $file = Reader::createFromFileObject($data['file']->openFile());
+        $file->setHeaderOffset(0);
+        $header = $file->getHeader();
+
+        $rowCount = iterator_count($file->getRecords());
+        $this->csvFileValidator->validateHeader($header);
+
+        $rowNumber = 1;
+        $invalidRows = [];
+
+        foreach ($file->getRecords() as $record) {
+            $rowNumber = $this->resultDataMapper->mapRecord($race, $record, $rowNumber, $invalidRows);
+        }
+
+        $this->resultRepository->flushAndClear($race);
+
+        $this->updateCalculations($race);
+
+        $this->averageFinishTimeService->updateAverageFinishTimeForMediumAndLongRaces($race);
 
         $response = [
             'race' => $race,
-            'message' => 'Successfully imported the objects', 'totalNumber' => $mappedData->getRowCount()
+            'message' => [
+                'Successfully imported the objects',
+                'totalNumber' => $rowCount,
+                'invalidRows' => count($invalidRows) > 0 ? implode(',', $invalidRows) : 'none',
+            ]
         ];
 
         return new Response($this->serializer->serialize($response, 'json', [
             DateTimeNormalizer::FORMAT_KEY => 'Y-m-d\TH:i:s.u\Z',
             JsonEncode::OPTIONS => JSON_PRETTY_PRINT
         ]));
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function updateCalculations(Race $race): void
+    {
+        $this->resultCalculationService->updatePlacementsForResults($race);
+        $this->resultCalculationService->updateAgeCategoryPlacementsForResults($race);
     }
 }

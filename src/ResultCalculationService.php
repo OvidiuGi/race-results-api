@@ -4,81 +4,62 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\DataMapper\DataMapperInterface;
-use App\DataMapper\ResultDataMapper;
+use App\Entity\Race;
+use App\Entity\Result;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 
 class ResultCalculationService
 {
-    public function __construct(private ResultDataMapper $dataMapper)
+    public function __construct(private readonly Connection $connection)
     {
     }
 
-    public function setDataMapper(DataMapperInterface $dataMapper): self
+    /**
+     * @throws Exception
+     */
+    public function updatePlacementsForResults(Race $race): void
     {
-        $this->dataMapper = $dataMapper;
-
-        return $this;
-    }
-
-    public function calculatePlacements(): void
-    {
-        $this->calculatePlacement(
-            $this->dataMapper->getResultsWithPlacements(),
-            'overallPlacement'
+        $sql = sprintf(
+            "
+            UPDATE result
+            JOIN (
+                SELECT id, race_id,
+                       ROW_NUMBER() OVER (PARTITION BY race_id ORDER BY finish_time) AS placement
+                  FROM result
+                  WHERE race_id = {$race->getId()} and distance = '%s'
+                 ORDER BY race_id, finish_time
+            ) AS ranked ON result.id = ranked.id
+            SET result.overall_placement = ranked.placement
+        ",
+            Result::DISTANCE_LONG
         );
 
-        $this->calculatePlacementAgeCategory(
-            $this->dataMapper->getResultsWithAgeCategory()
+        $stmt = $this->connection->prepare($sql);
+        $stmt->executeStatement();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function updateAgeCategoryPlacementsForResults(Race $race): void
+    {
+        $sql = sprintf(
+            "
+            UPDATE result
+            JOIN (
+                SELECT id, race_id, age_category,
+                       ROW_NUMBER() OVER (PARTITION BY race_id, age_category ORDER BY finish_time) AS placement
+                  FROM result
+                  WHERE race_id = {$race->getId()} and distance = '%s'
+                 ORDER BY race_id, age_category, finish_time
+            ) AS ranked ON result.id = ranked.id
+            SET result.age_category_placement = ranked.placement
+        ",
+            Result::DISTANCE_LONG
         );
-    }
 
-    public function calculatePlacementAgeCategory(array $data): void
-    {
-        foreach ($data as $ageCategory => $results) {
-            $this->calculatePlacement($results, 'ageCategoryPlacement');
-        }
-    }
-
-    public function calculatePlacement(array $data, string $context): void
-    {
-        uasort($data, fn($a, $b) => $a->getFinishTime() <=> $b->getFinishTime());
-
-        $placement = 1;
-        foreach ($data as $datum) {
-            $datum->{$context} = $placement;
-            $placement++;
-        }
-    }
-
-    public function setAverageFinishTime(): void
-    {
-        $this
-            ->dataMapper
-            ->getRace()
-            ->setAverageFinishMedium(
-                $this->calculateAverageFinishTime(
-                    $this->dataMapper->getResultsWithoutPlacements()
-                )
-            );
-
-        $this
-            ->dataMapper
-            ->getRace()
-            ->setAverageFinishLong(
-                $this->calculateAverageFinishTime(
-                    $this->dataMapper->getResultsWithPlacements()
-                )
-            );
-    }
-
-    private function calculateAverageFinishTime(array $data): \DateTimeImmutable
-    {
-        $result = 0;
-
-        foreach ($data as $object) {
-            $result += $object->getFinishTime()->getTimestamp();
-        }
-
-        return new \DateTimeImmutable('@' . (int) ($result / count($data)));
+        $stmt = $this->connection->prepare($sql);
+        $stmt->executeStatement();
     }
 }
