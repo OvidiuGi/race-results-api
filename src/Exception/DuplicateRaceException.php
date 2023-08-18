@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Exception\CustomException;
+namespace App\Exception;
 
 class DuplicateRaceException extends \Exception
 {

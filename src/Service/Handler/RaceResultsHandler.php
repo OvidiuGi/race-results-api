@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service\Handler;
 
-use App\Exception\CustomException\DuplicateRaceException;
-use App\Exception\CustomException\RaceResultHandlingException;
+use App\Exception\DuplicateRaceException;
+use App\Exception\RaceResultHandlingException;
 use App\Importer\ImporterInterface;
 use App\Repository\RaceRepository;
 use Symfony\Component\HttpFoundation\Response;
