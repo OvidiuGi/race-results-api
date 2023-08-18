@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use App\Repository\ResultRepository;
+use App\State\ResultRecalculatePlacementsProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -48,7 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             'groups' => [
                 'edit'
             ]
-        ]
+        ],
     )
 ]
 class Result
