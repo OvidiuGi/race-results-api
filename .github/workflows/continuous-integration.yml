@@ -84,7 +84,7 @@ jobs:
 
       - name: PHPCS
         run: |
-          ./vendor/bin/phpcs ./config ./src ./tests --no-colors --no-cache
+          ./vendor/bin/phpcs ./config ./src ./tests --no-colors --no-cache --standard=PSR12
 
       - name: PHPStan
         run: ./vendor/bin/phpstan analyse src/ --level=5 --no-interaction --no-progress

@@ -22,6 +22,8 @@
 /.phpcs-cache
 /phpcs.xml
 
+/phpcs.xml.dist
+
 /phpstan.neon
 .phpunit.result.cache
 phpunit.xml.dist
