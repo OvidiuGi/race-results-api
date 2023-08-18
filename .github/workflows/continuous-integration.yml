@@ -23,7 +23,7 @@ jobs:
         run: |
           mysql --version
           sudo apt-get install -y mysql-client
-          mysql --host 127.0.0.1 --port 3306 -uuser -pChangeMe -e "SHOW DATABASES"
+          mysql --host 127.0.0.1 --port 3306 -uroot -proot -e "SHOW DATABASES"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -62,7 +62,7 @@ jobs:
         run: |
           mysql --version
           sudo apt-get install -y mysql-client
-          mysql --host 127.0.0.1 --port 3306 -uuser -pChangeMe -e "SHOW DATABASES"
+          mysql --host 127.0.0.1 --port 3306 -uroot -proot -e "SHOW DATABASES"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
