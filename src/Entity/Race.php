@@ -16,7 +16,6 @@ use App\Repository\RaceRepository;
 use ApiPlatform\OpenApi\Model;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RaceRepository::class, readOnly: true)]
@@ -92,7 +91,7 @@ class Race
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private int $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank]
