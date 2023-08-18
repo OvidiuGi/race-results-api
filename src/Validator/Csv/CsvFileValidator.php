@@ -17,8 +17,8 @@ class CsvFileValidator extends AbstractFileValidator
             'fullName' => new Assert\NotBlank(),
             'distance' => new Assert\Choice(options: Result::DISTANCES),
             'finishTime' => [
-                new Assert\Type(
-                    \DateTimeImmutable::class,
+                new Assert\Regex(
+                    pattern: '/^([0-9]|[0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/',
                     message: 'This value should be written in this format: HH:MM:SS'
                 ),
                 new Assert\NotBlank(),

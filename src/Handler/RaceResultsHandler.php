@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Handler;
+namespace App\Handler;
 
 use App\Exception\DuplicateRaceException;
 use App\Exception\RaceResultHandlingException;
@@ -10,11 +10,11 @@ use App\Importer\ImporterInterface;
 use App\Repository\RaceRepository;
 use Symfony\Component\HttpFoundation\Response;
 
-class RaceResultsHandler
+readonly class RaceResultsHandler
 {
     public function __construct(
-        private readonly RaceRepository $raceRepository,
-        private readonly ImporterInterface $raceResultsImporter
+        private RaceRepository $raceRepository,
+        private ImporterInterface $raceResultsImporter
     ) {
     }
 
@@ -24,7 +24,10 @@ class RaceResultsHandler
      */
     public function handle(array $data): Response
     {
-        $race = $this->raceRepository->findByRaceDto($data['raceDto']);
+        $race = $this->raceRepository->findOneBy([
+                'title' => $data['raceDto']->title,
+                'date' => $data['raceDto']->date,
+        ]);
 
         if ($race) {
             throw new DuplicateRaceException($race->title, $race->getDate());

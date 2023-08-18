@@ -40,7 +40,7 @@ class Race
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank]
@@ -104,7 +104,7 @@ class Race
         $race = new self();
 
         $race->title = $dto->title;
-        $race->date = $dto->getDate();
+        $race->date = $dto->date;
 
         return $race;
     }

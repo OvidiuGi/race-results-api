@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App;
 
-use App\Service\DataMapper\DataMapperInterface;
-use App\Service\DataMapper\ResultDataMapper;
+use App\DataMapper\DataMapperInterface;
+use App\DataMapper\ResultDataMapper;
 
 class ResultCalculationService
 {

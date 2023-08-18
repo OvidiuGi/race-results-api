@@ -27,12 +27,4 @@ class RaceRepository extends ServiceEntityRepository
             $this->entityManager->flush();
         }
     }
-
-    public function findByRaceDto(RaceDto $raceDto): null|object
-    {
-        return $this->findOneBy([
-            'title' => $raceDto->title,
-            'date' => $raceDto->getDate(),
-        ]);
-    }
 }

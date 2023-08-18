@@ -66,7 +66,7 @@ class Result
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank]
@@ -99,7 +99,7 @@ class Result
     #[ORM\ManyToOne(targetEntity: Race::class)]
     #[ORM\JoinColumn(name: 'race_id', referencedColumnName: 'id')]
     #[Groups('edit')]
-    private ?Race $race;
+    private Race $race;
 
     public function getId(): ?int
     {
@@ -118,14 +118,14 @@ class Result
         return $this->finishTime;
     }
 
-    public function setRace(?Race $race): self
+    public function setRace(Race $race): self
     {
         $this->race = $race;
 
         return $this;
     }
 
-    public function getRace(): ?Race
+    public function getRace(): Race
     {
         return $this->race;
     }

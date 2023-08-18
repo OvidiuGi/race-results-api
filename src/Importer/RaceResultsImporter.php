@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Importer;
 
+use App\DataMapper\DataMapperInterface;
+use App\DataProcessor\DataProcessorInterface;
 use App\Entity\Race;
 use App\Repository\RaceRepository;
 use App\Repository\ResultRepository;
-use App\Service\DataMapper\DataMapperInterface;
-use App\Service\DataProcessor\DataProcessorInterface;
-use App\Service\ResultCalculationService;
+use App\ResultCalculationService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;

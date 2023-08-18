@@ -12,19 +12,7 @@ class RaceDto
         #[Assert\NotBlank]
         public string $title,
         #[Assert\Type(\DateTimeImmutable::class)]
-        private \DateTimeImmutable $date
+        public \DateTimeImmutable $date
     ) {
-    }
-
-    public function setDate(\DateTimeImmutable $date): self
-    {
-        $this->date = $date;
-
-        return $this;
-    }
-
-    public function getDate(): \DateTimeImmutable
-    {
-        return $this->date;
     }
 }

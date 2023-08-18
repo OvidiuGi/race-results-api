@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\DataMapper;
+namespace App\DataMapper;
 
 use App\Entity\Race;
 use App\Entity\Result;

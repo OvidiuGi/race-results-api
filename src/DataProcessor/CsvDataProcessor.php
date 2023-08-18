@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\DataProcessor;
+namespace App\DataProcessor;
 
 use App\Validator\Csv\CsvFileValidator;
 use League\Csv\Exception;
