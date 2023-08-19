@@ -18,7 +18,7 @@ class ResultCalculationService
     /**
      * @throws Exception
      */
-    public function updatePlacementsForResults(Race $race): void
+    public function updateOverallPlacements(Race $race): void
     {
         $sql = sprintf(
             "
@@ -31,6 +31,7 @@ class ResultCalculationService
                  ORDER BY race_id, finish_time
             ) AS ranked ON result.id = ranked.id
             SET result.overall_placement = ranked.placement
+            WHERE result.race_id = {$race->getId()}
         ",
             Result::DISTANCE_LONG
         );
@@ -42,7 +43,7 @@ class ResultCalculationService
     /**
      * @throws Exception
      */
-    public function updateAgeCategoryPlacementsForResults(Race $race): void
+    public function updateAgeCategoryPlacements(Race $race): void
     {
         $sql = sprintf(
             "
@@ -55,6 +56,7 @@ class ResultCalculationService
                  ORDER BY race_id, age_category, finish_time
             ) AS ranked ON result.id = ranked.id
             SET result.age_category_placement = ranked.placement
+            WHERE result.race_id = {$race->getId()}
         ",
             Result::DISTANCE_LONG
         );

@@ -50,8 +50,8 @@ class AppFixtures extends Fixture
      */
     private function setPlacementsAndAverageFinishTime(Race $race): void
     {
-        $this->resultCalculationService->updatePlacementsForResults($race);
-        $this->resultCalculationService->updateAgeCategoryPlacementsForResults($race);
+        $this->resultCalculationService->updateOverallPlacements($race);
+        $this->resultCalculationService->updateAgeCategoryPlacements($race);
         $this->averageFinishTimeService->updateAverageFinishTimeForMediumAndLongRaces($race);
     }
 }
