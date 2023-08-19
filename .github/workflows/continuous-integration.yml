@@ -41,7 +41,7 @@ jobs:
           DATABASE_URL: "mysql://user:ChangeMe@127.0.0.1:3306/race_results_api?serverVersion=5.7"
 
       - name: Execute PHPUnit tests
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit tests
 
   code-quality:
     name: PHP Code Quality Analysis
