@@ -11,9 +11,10 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use App\Repository\ResultRepository;
-use App\State\ResultRecalculatePlacementsProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ResultRepository::class)]
@@ -22,11 +23,14 @@ use Symfony\Component\Validator\Constraints as Assert;
     ApiResource(
         uriTemplate: '/races/{raceId}/results',
         operations: [
-            new GetCollection()
+            new GetCollection(),
+            new Patch(),
         ],
         uriVariables: [
             'raceId' => new Link(toProperty: 'race', fromClass: Race::class)
-        ]
+        ],
+        normalizationContext: ['groups' => 'read'],
+        denormalizationContext: ['groups' => 'write'],
     ),
     ApiFilter(
         OrderFilter::class,
@@ -38,18 +42,6 @@ use Symfony\Component\Validator\Constraints as Assert;
             'overallPlacement',
             'ageCategoryPlacement'
         ]
-    )
-]
-#[
-    ApiResource(
-        operations: [
-            new Patch()
-        ],
-        denormalizationContext: [
-            'groups' => [
-                'edit'
-            ]
-        ],
     )
 ]
 class Result
@@ -66,39 +58,43 @@ class Result
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank]
-    #[Groups(['edit'])]
+    #[Groups(['read', 'write'])]
     public string $fullName = '';
 
     #[ORM\Column(type: 'string')]
     #[Assert\Choice(choices: self::DISTANCES), Assert\NotBlank]
-    #[Groups(['edit'])]
+    #[Groups(['read', 'write'])]
     public string $distance = '';
 
     #[ORM\Column(type: 'time_immutable')]
     #[Assert\Type(\DateTimeImmutable::class)]
-    #[Groups(['edit'])]
+    #[Groups(['read', 'write'])]
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'H:i:s'])]
     private \DateTimeImmutable $finishTime;
 
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank]
-    #[Groups(['edit'])]
+    #[Groups(['read', 'write'])]
     public string $ageCategory = '';
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Assert\Positive]
+    #[Groups(['read'])]
     public ?int $overallPlacement = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Assert\Positive]
+    #[Groups(['read'])]
     public ?int $ageCategoryPlacement = null;
 
     #[ORM\ManyToOne(targetEntity: Race::class)]
     #[ORM\JoinColumn(name: 'race_id', referencedColumnName: 'id')]
-    #[Groups('edit')]
+    #[Groups(['read'])]
     private Race $race;
 
     public function getId(): ?int

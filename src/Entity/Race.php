@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -16,6 +17,7 @@ use App\Repository\RaceRepository;
 use ApiPlatform\OpenApi\Model;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RaceRepository::class, readOnly: true)]
@@ -74,14 +76,22 @@ use Symfony\Component\Validator\Constraints as Assert;
                 name: 'import',
             )
         ],
+        normalizationContext: ['groups' => 'read'],
+        denormalizationContext: ['groups' => 'write'],
     ),
     ApiFilter(
         OrderFilter::class,
         properties: [
-            'name',
+            'title',
             'date',
             'averageFinishMedium',
             'averageFinishLong'
+        ]
+    ),
+    ApiFilter(
+        SearchFilter::class,
+        properties: [
+            'title' => 'partial',
         ]
     )
 ]
@@ -91,22 +101,27 @@ class Race
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string')]
     #[Assert\NotBlank]
+    #[Groups(['read', 'write'])]
     public string $title = '';
 
     #[ORM\Column(type: 'date_immutable')]
     #[Assert\Type(\DateTimeImmutable::class)]
+    #[Groups(['read', 'write'])]
     private \DateTimeImmutable $date;
 
     #[ORM\Column(type: 'time_immutable', nullable: true)]
     #[Assert\Type(\DateTimeImmutable::class)]
+    #[Groups(['read', 'write'])]
     private ?\DateTimeImmutable $averageFinishMedium;
 
     #[ORM\Column(type: 'time_immutable', nullable: true)]
     #[Assert\Type(\DateTimeImmutable::class)]
+    #[Groups(['read', 'write'])]
     private ?\DateTimeImmutable $averageFinishLong;
 
     public function getId(): ?int

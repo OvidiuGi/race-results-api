@@ -54,11 +54,11 @@ class RaceResultsImporter implements ImporterInterface
             $rowNumber = $this->resultDataMapper->mapRecord($race, $record, $rowNumber, $invalidRows);
         }
 
-        $this->resultRepository->flushAndClear($race);
-
-        $this->updateCalculations($race);
+//        $this->resultRepository->flushAndClear($race);
 
         $this->averageFinishTimeService->updateAverageFinishTimeForMediumAndLongRaces($race);
+
+        $this->updateCalculations($race);
 
         $response = [
             'race' => $race,
