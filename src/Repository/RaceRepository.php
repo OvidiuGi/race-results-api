@@ -28,4 +28,9 @@ class RaceRepository extends ServiceEntityRepository
             $this->entityManager->flush();
         }
     }
+
+    public function flush(): void
+    {
+        $this->entityManager->flush();
+    }
 }

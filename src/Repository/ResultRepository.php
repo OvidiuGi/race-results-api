@@ -34,7 +34,6 @@ class ResultRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-
     public function flushAndClear(Race &$race): void
     {
         $this->entityManager->flush();

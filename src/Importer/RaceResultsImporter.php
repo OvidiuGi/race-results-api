@@ -38,8 +38,8 @@ class RaceResultsImporter implements ImporterInterface
     public function import(array $data): Response
     {
         $race = Race::createFromDto($data['raceDto']);
-        $this->raceRepository->save($race, true);
 
+        $this->raceRepository->save($race);
         $file = Reader::createFromFileObject($data['file']->openFile());
         $file->setHeaderOffset(0);
         $header = $file->getHeader();
@@ -54,16 +54,18 @@ class RaceResultsImporter implements ImporterInterface
             $rowNumber = $this->resultDataMapper->mapRecord($race, $record, $rowNumber, $invalidRows);
         }
 
-//        $this->resultRepository->flushAndClear($race);
+        $this->resultRepository->flushAndClear($race);
 
         $this->averageFinishTimeService->updateAverageFinishTimeForMediumAndLongRaces($race);
+
+        $this->raceRepository->flush();
 
         $this->updateCalculations($race);
 
         $response = [
             'race' => $race,
             'message' => [
-                'Successfully imported the objects',
+                'status' => 'Successfully imported the objects',
                 'totalNumber' => $rowCount,
                 'invalidRows' => count($invalidRows) > 0 ? implode(',', $invalidRows) : 'none',
             ]

@@ -6,14 +6,18 @@ namespace App;
 
 use App\Entity\Race;
 use App\Entity\Result;
+use App\Repository\RaceRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 
 class AverageFinishTimeService
 {
-    public function __construct(private readonly Connection $connection, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly RaceRepository $raceRepository
+    ) {
     }
 
     /**
@@ -44,16 +48,13 @@ class AverageFinishTimeService
 //        $stmt->executeStatement();
 //    }
 
-    public function updateAverageFinishTimeForMediumAndLongRaces(Race &$race): void
+    public function updateAverageFinishTimeForMediumAndLongRaces(Race $race): void
     {
         $mediumAvg = $this->calculateAverageFinishTime($race, Result::DISTANCE_MEDIUM);
         $longAvg = $this->calculateAverageFinishTime($race, Result::DISTANCE_LONG);
 
         $race->setAverageFinishMedium($mediumAvg);
         $race->setAverageFinishLong($longAvg);
-
-        $this->entityManager->persist($race);
-        $this->entityManager->flush();
     }
 
     private function calculateAverageFinishTime(Race $race, string $distance): ?\DateTimeImmutable
