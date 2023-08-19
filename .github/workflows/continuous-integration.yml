@@ -1,0 +1,90 @@
+name: Continuous Integration
+on: push
+jobs:
+  phpunit:
+    name: PHPUnit Tests
+    runs-on: ubuntu-22.04
+    services:
+      mysqldb:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: user
+          MYSQL_PASSWORD: ChangeMe
+          MYSQL_DATABASE: race_results_api
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - name: Apt Update
+        run: sudo apt update
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Verify MySQL connection
+        run: |
+          mysql --version
+          sudo apt-get install -y mysql-client
+          mysql --host 127.0.0.1 --port 3306 -uroot -proot -e "SHOW DATABASES"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          ini-values: date.timezone=Europe/Bucharest
+          php-version: 8.2
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+        env:
+          DATABASE_URL: "mysql://user:ChangeMe@127.0.0.1:3306/race_results_api?serverVersion=5.7"
+
+      - name: Execute PHPUnit tests
+        run: ./vendor/bin/phpunit tests
+
+  code-quality:
+    name: PHP Code Quality Analysis
+    runs-on: ubuntu-22.04
+    services:
+      mysqldb:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: user
+          MYSQL_PASSWORD: ChangeMe
+          MYSQL_DATABASE: race_results_api
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - name: Apt Update
+        run: sudo apt update
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Verify MySQL connection
+        run: |
+          mysql --version
+          sudo apt-get install -y mysql-client
+          mysql --host 127.0.0.1 --port 3306 -uroot -proot -e "SHOW DATABASES"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          ini-values: date.timezone=Europe/Bucharest
+          php-version: 8.2
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+        env:
+          DATABASE_URL: "mysql://root:root@127.0.0.1:3306/race_results_api?serverVersion=5.7"
+
+      - name: PHPCS
+        run: |
+          ./vendor/bin/phpcs ./config ./src ./tests --no-colors --no-cache --standard=PSR12
+
+      - name: PHPStan
+        run: ./vendor/bin/phpstan analyse src/ --level=5 --no-interaction --no-progress
