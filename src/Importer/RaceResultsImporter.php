@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Importer;
 
-use App\AverageFinishTimeService;
 use App\DataMapper\ResultDataMapper;
 use App\Entity\Race;
+use App\Entity\Result;
 use App\Repository\RaceRepository;
 use App\Repository\ResultRepository;
-use App\ResultCalculationService;
 use App\Validator\Csv\CsvFileValidator;
+use Doctrine\ORM\EntityManagerInterface;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,9 +25,8 @@ class RaceResultsImporter implements ImporterInterface
         private readonly ResultRepository $resultRepository,
         private readonly RaceRepository $raceRepository,
         private readonly CsvFileValidator $csvFileValidator,
-        private readonly AverageFinishTimeService $averageFinishTimeService,
-        private readonly ResultCalculationService $resultCalculationService,
-        private readonly ResultDataMapper $resultDataMapper
+        private readonly ResultDataMapper $resultDataMapper,
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
@@ -37,33 +36,36 @@ class RaceResultsImporter implements ImporterInterface
      */
     public function import(array $data): Response
     {
+        $file = Reader::createFromFileObject($data['file']->openFile());
+        $file->setHeaderOffset(0);
+
+        $this->csvFileValidator->validateHeader($file->getHeader());
+
         $race = Race::createFromDto($data['raceDto']);
         $this->raceRepository->save($race, true);
 
-        $file = Reader::createFromFileObject($data['file']->openFile());
-        $file->setHeaderOffset(0);
-        $header = $file->getHeader();
-
-        $rowCount = iterator_count($file->getRecords());
-        $this->csvFileValidator->validateHeader($header);
-
         $rowNumber = 1;
+        $rowCount = 1;
         $invalidRows = [];
 
         foreach ($file->getRecords() as $record) {
             $rowNumber = $this->resultDataMapper->mapRecord($race, $record, $rowNumber, $invalidRows);
+            $rowCount++;
         }
 
-        $this->resultRepository->flushAndClear($race);
+        $this->entityManager->flush();
 
-        $this->updateCalculations($race);
+        $this->setAverageFinishTimes($race);
 
-        $this->averageFinishTimeService->updateAverageFinishTimeForMediumAndLongRaces($race);
+        $this->entityManager->flush();
+        $this->entityManager->clear();
+
+        $this->calculatePlacements($race);
 
         $response = [
             'race' => $race,
             'message' => [
-                'Successfully imported the objects',
+                'status' => 'Successfully imported the objects',
                 'totalNumber' => $rowCount,
                 'invalidRows' => count($invalidRows) > 0 ? implode(',', $invalidRows) : 'none',
             ]
@@ -75,12 +77,25 @@ class RaceResultsImporter implements ImporterInterface
         ]));
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function updateCalculations(Race $race): void
+    private function setAverageFinishTimes(Race $race): void
     {
-        $this->resultCalculationService->updatePlacementsForResults($race);
-        $this->resultCalculationService->updateAgeCategoryPlacementsForResults($race);
+        $race->setAverageFinishMedium(
+            $this->raceRepository->getAverageFinishTime(
+                $race,
+                Result::DISTANCE_MEDIUM
+            )
+        );
+        $race->setAverageFinishLong(
+            $this->raceRepository->getAverageFinishTime(
+                $race,
+                Result::DISTANCE_LONG
+            )
+        );
+    }
+
+    private function calculatePlacements(Race $race): void
+    {
+        $this->resultRepository->calculateOverallPlacements($race);
+        $this->resultRepository->calculateAgeCategoryPlacements($race);
     }
 }

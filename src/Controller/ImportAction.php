@@ -38,7 +38,7 @@ class ImportAction extends AbstractController
                 'date' => $raceDto->date,
             ]);
 
-            if ($race != null) {
+            if ($race !== null) {
                 $this->logger->info('Duplicate Race import attempt', [
                     'title' => $race->title,
                     'date' => $race->getDate(),
