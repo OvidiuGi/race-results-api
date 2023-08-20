@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Validator;
 
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints\Collection;
@@ -14,7 +13,7 @@ abstract class AbstractFileValidator
 {
     public function __construct(
         private readonly ValidatorInterface $validator,
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
         protected Collection $rowConstraints,
         protected array $fileConstraints = [],
         protected array $requiredFields = []

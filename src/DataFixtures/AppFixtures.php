@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
-use App\AverageFinishTimeService;
 use App\Entity\Race;
 use App\Entity\Result;
-use App\ResultCalculationService;
+use App\Repository\RaceRepository;
+use App\Repository\ResultRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture
 {
     public function __construct(
-        private readonly AverageFinishTimeService $averageFinishTimeService,
-        private readonly ResultCalculationService $resultCalculationService
+        private readonly RaceRepository $raceRepository,
+        private readonly ResultRepository $resultRepository
     ) {
     }
 
@@ -38,20 +37,24 @@ class AppFixtures extends Fixture
                 $manager->persist($result);
             }
 
+            $race->setAverageFinishLong(
+                $this->raceRepository->getAverageFinishTime(
+                    $race,
+                    Result::DISTANCE_LONG
+                )
+            );
+            $race->setAverageFinishMedium(
+                $this->raceRepository->getAverageFinishTime(
+                    $race,
+                    Result::DISTANCE_MEDIUM
+                )
+            );
+
+            $this->resultRepository->calculateOverallPlacements($race);
+            $this->resultRepository->calculateAgeCategoryPlacements($race);
+
             $manager->persist($race);
             $manager->flush();
-
-            $this->setPlacementsAndAverageFinishTime($race);
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function setPlacementsAndAverageFinishTime(Race $race): void
-    {
-        $this->resultCalculationService->updateOverallPlacements($race);
-        $this->resultCalculationService->updateAgeCategoryPlacements($race);
-        $this->averageFinishTimeService->updateAverageFinishTimeForMediumAndLongRaces($race);
     }
 }

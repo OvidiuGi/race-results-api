@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -21,13 +22,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'result')]
 #[
     ApiResource(
-        uriTemplate: '/races/{raceId}/results',
         operations: [
-            new GetCollection(),
+            new GetCollection(
+                uriTemplate: '/races/{race_id}/results',
+                uriVariables: ['race_id' => new Link(toProperty: 'race', fromClass: Race::class)]
+            ),
             new Patch(),
-        ],
-        uriVariables: [
-            'raceId' => new Link(toProperty: 'race', fromClass: Race::class)
         ],
         normalizationContext: ['groups' => 'read'],
         denormalizationContext: ['groups' => 'write'],
@@ -42,7 +42,15 @@ use Symfony\Component\Validator\Constraints as Assert;
             'overallPlacement',
             'ageCategoryPlacement'
         ]
-    )
+    ),
+    ApiFilter(
+        SearchFilter::class,
+        properties: [
+            'fullName' => 'partial',
+            'distance' => 'exact',
+            'ageCategory' => 'exact',
+        ]
+    ),
 ]
 class Result
 {

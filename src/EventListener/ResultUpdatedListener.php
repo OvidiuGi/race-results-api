@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\AverageFinishTimeService;
 use App\Entity\Result;
+use App\Repository\RaceRepository;
 use App\Repository\ResultRepository;
-use App\ResultCalculationService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\ORM\Events;
@@ -16,9 +15,8 @@ use Doctrine\ORM\Events;
 class ResultUpdatedListener
 {
     public function __construct(
-        private readonly AverageFinishTimeService $averageFinishTimeService,
-        private readonly ResultCalculationService $resultCalculationService,
-        private readonly ResultRepository $resultRepository
+        private readonly ResultRepository $resultRepository,
+        private readonly RaceRepository $raceRepository
     ) {
     }
 
@@ -31,21 +29,32 @@ class ResultUpdatedListener
         $changedPlacement = $this->isPlacementChanged($result);
 
         if ($changedPlacement === 'both' || $changedPlacement === 'overall') {
-            $this->resultCalculationService->updateOverallPlacements($result->getRace());
+            $this->resultRepository->calculateOverallPlacements($result->getRace());
         }
 
         if ($changedPlacement === 'both' || $changedPlacement === 'ageCategory') {
-            $this->resultCalculationService->updateAgeCategoryPlacements($result->getRace());
+            $this->resultRepository->calculateAgeCategoryPlacements($result->getRace());
         }
 
-        $this->averageFinishTimeService->updateAverageFinishTimeForLongRace($result->getRace());
+        $result
+            ->getRace()
+            ->setAverageFinishLong(
+                $this->raceRepository->getAverageFinishTime(
+                    $result->getRace(),
+                    Result::DISTANCE_LONG
+                )
+            );
 
         $objectManager = $event->getObjectManager();
         $objectManager->flush();
     }
 
-    private function isPlacementChanged(Result $data): string
+    private function isPlacementChanged(Result $data): string|null
     {
+        if ($this->compareOverall($data) && $this->compareAgeCategory($data)) {
+            return 'both';
+        }
+
         if ($this->compareOverall($data)) {
             return 'overall';
         }
@@ -54,7 +63,51 @@ class ResultUpdatedListener
             return 'ageCategory';
         }
 
-        return 'none';
+        return null;
+    }
+
+    private function compareOverall(Result $current): bool
+    {
+        $previous = $this->resultRepository->findOneBy([
+            'overallPlacement' => $current->overallPlacement - 1,
+        ]);
+
+        $next = $this->resultRepository->findOneBy([
+            'overallPlacement' => $current->overallPlacement + 1,
+        ]);
+
+        if ($previous && $previous->getFinishTime()->format('H:i:s') >= $current->getFinishTime()->format('H:i:s')) {
+            return true;
+        }
+
+        if ($next && $next->getFinishTime()->format('H:i:s') <= $current->getFinishTime()->format('H:i:s')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function compareAgeCategory(Result $current): bool
+    {
+        $previous = $this->resultRepository->findOneBy([
+            'ageCategoryPlacement' => $current->ageCategoryPlacement - 1,
+            'ageCategory' => $current->ageCategory
+        ]);
+
+        $next = $this->resultRepository->findOneBy([
+            'ageCategoryPlacement' => $current->overallPlacement + 1,
+            'ageCategory' => $current->ageCategory
+        ]);
+
+        if ($previous && $previous->getFinishTime()->format('H:i:s') >= $current->getFinishTime()->format('H:i:s')) {
+            return true;
+        }
+
+        if ($next && $next->getFinishTime()->format('H:i:s') <= $current->getFinishTime()->format('H:i:s')) {
+            return true;
+        }
+
+        return false;
     }
 
     private function comparePlacements(Result $current, string $placementType): bool
@@ -72,24 +125,14 @@ class ResultUpdatedListener
             'ageCategory' => $current->ageCategory
         ]);
 
-        if ($previous && $previous->getFinishTime() >= $current->getFinishTime()) {
+        if ($previous && $previous->getFinishTime()->format('H:i:s') >= $current->getFinishTime()->format('H:i:s')) {
             return true;
         }
 
-        if ($next && $next->getFinishTime() <= $current->getFinishTime()) {
+        if ($next && $next->getFinishTime()->format('H:i:s') <= $current->getFinishTime()->format('H:i:s')) {
             return true;
         }
 
         return false;
-    }
-
-    private function compareOverall(Result $current): bool
-    {
-        return $this->comparePlacements($current, 'overall');
-    }
-
-    private function compareAgeCategory(Result $current): bool
-    {
-        return $this->comparePlacements($current, 'ageCategory');
     }
 }

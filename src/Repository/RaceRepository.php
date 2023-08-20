@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Dto\RaceDto;
 use App\Entity\Race;
+use App\Entity\Result;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,8 +30,21 @@ class RaceRepository extends ServiceEntityRepository
         }
     }
 
-    public function flush(): void
+    public function getAverageFinishTime(Race $race, string $distance): ?\DateTimeImmutable
     {
-        $this->entityManager->flush();
+        $connection = $this->entityManager->getConnection();
+
+        $sql = "
+            SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(finish_time)))
+            FROM result
+            WHERE race_id = :raceId AND distance = :distance
+        ";
+
+        $result = $connection->executeQuery($sql, [
+            'raceId' => $race->getId(),
+            'distance' => $distance,
+        ])->fetchOne();
+
+        return new \DateTimeImmutable($result);
     }
 }
