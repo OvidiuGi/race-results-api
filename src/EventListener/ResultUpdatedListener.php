@@ -109,30 +109,4 @@ class ResultUpdatedListener
 
         return false;
     }
-
-    private function comparePlacements(Result $current, string $placementType): bool
-    {
-        $placementProperty = $placementType === 'overall' ? 'overallPlacement' : 'ageCategoryPlacement';
-        $placementValue = $placementType === 'overall' ? $current->overallPlacement : $current->ageCategoryPlacement;
-
-        $previous = $this->resultRepository->findOneBy([
-            $placementProperty => $placementValue - 1,
-            'ageCategory' => $current->ageCategory
-        ]);
-
-        $next = $this->resultRepository->findOneBy([
-            $placementProperty => $placementValue + 1,
-            'ageCategory' => $current->ageCategory
-        ]);
-
-        if ($previous && $previous->getFinishTime()->format('H:i:s') >= $current->getFinishTime()->format('H:i:s')) {
-            return true;
-        }
-
-        if ($next && $next->getFinishTime()->format('H:i:s') <= $current->getFinishTime()->format('H:i:s')) {
-            return true;
-        }
-
-        return false;
-    }
 }
