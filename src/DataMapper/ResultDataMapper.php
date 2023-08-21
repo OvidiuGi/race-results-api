@@ -20,11 +20,12 @@ class ResultDataMapper implements DataMapperInterface
     ) {
     }
 
-    public function mapRecord(Race &$race, array $record, int $rowNumber, array &$invalidRows): int
+    public function mapRecord(Race &$race, array $record, int $rowNumber, array &$invalidRows): void
     {
         if (!$this->csvFileValidator->validateRow($record, $rowNumber)) {
             $invalidRows[] = $rowNumber;
-            return ++$rowNumber;
+
+            return;
         }
 
         $result = Result::createFromArray($record);
@@ -35,7 +36,5 @@ class ResultDataMapper implements DataMapperInterface
             $this->resultRepository->flushAndClear();
             $race = $this->raceRepository->find($race->getId());
         }
-
-        return ++$rowNumber;
     }
 }

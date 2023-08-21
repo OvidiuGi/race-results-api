@@ -4,3 +4,4 @@ api_platform:
     json: [ 'application/json' ]
     html: [ 'text/html' ]
     multipart: ['multipart/form-data']
+    json-patch: ['application/json-patch+json']

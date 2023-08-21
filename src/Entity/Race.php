@@ -13,10 +13,14 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 use App\Controller\ImportAction;
 use App\Dto\RaceDto;
+use App\Exception\DuplicateRaceException;
 use App\Repository\RaceRepository;
 use ApiPlatform\OpenApi\Model;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -66,14 +70,16 @@ use Symfony\Component\Validator\Constraints as Assert;
                                             'type' => 'string',
                                             'format' => 'binary',
                                             'description' => 'Upload the CSV file',
-                                            'example' => 'import.csv'
+                                            'example' => 'import.csv',
+                                            'required' => true,
                                         ],
                                     ]
-                                ]
+                                ],
                             ]
                         ])
                     )
                 ),
+                input: [RaceDto::class, File::class],
                 deserialize: false,
                 name: 'import',
             )

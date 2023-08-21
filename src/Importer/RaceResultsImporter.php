@@ -36,6 +36,8 @@ class RaceResultsImporter implements ImporterInterface
      */
     public function import(array $data): Response
     {
+        $this->csvFileValidator->validateFile($data['file']);
+
         $file = Reader::createFromFileObject($data['file']->openFile());
         $file->setHeaderOffset(0);
 
@@ -44,12 +46,11 @@ class RaceResultsImporter implements ImporterInterface
         $race = Race::createFromDto($data['raceDto']);
         $this->raceRepository->save($race, true);
 
-        $rowNumber = 1;
-        $rowCount = 1;
+        $rowCount = 0;
         $invalidRows = [];
 
         foreach ($file->getRecords() as $record) {
-            $rowNumber = $this->resultDataMapper->mapRecord($race, $record, $rowNumber, $invalidRows);
+            $this->resultDataMapper->mapRecord($race, $record, $rowCount, $invalidRows);
             $rowCount++;
         }
 
@@ -74,7 +75,7 @@ class RaceResultsImporter implements ImporterInterface
         return new Response($this->serializer->serialize($response, 'json', [
             DateTimeNormalizer::FORMAT_KEY => 'Y-m-d\TH:i:s.u\Z',
             JsonEncode::OPTIONS => JSON_PRETTY_PRINT
-        ]));
+        ]), Response::HTTP_CREATED);
     }
 
     private function setAverageFinishTimes(Race $race): void

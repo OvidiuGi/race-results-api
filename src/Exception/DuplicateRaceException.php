@@ -13,7 +13,7 @@ class DuplicateRaceException extends \Exception
         int $code = 0,
         ?\Throwable $previous = null
     ) {
-        $message = sprintf($this->message, $title, $date->format('Y-m-d\TH:i:s.u\Z'));
+        $message = sprintf($this->message, $title, $date->format('Y-m-d'));
         parent::__construct($message, $code, $previous);
     }
 

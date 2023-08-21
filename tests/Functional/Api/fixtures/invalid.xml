@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <row>
+        <fullName>Matthias Floyd</fullName>
+        <distance>medium</distance>
+        <finishTime>5:15:24</finishTime>
+        <ageCategory>M18-25</ageCategory>
+    </row>
+    <row>
+        <fullName>Toby Phillips</fullName>
+        <distance>long</distance>
+        <finishTime>4:07:45</finishTime>
+        <ageCategory>M26-34</ageCategory>
+    </row>
+    <row>
+        <fullName>Paloma Mclean</fullName>
+        <distance>long</distance>
+        <finishTime>4:04:31</finishTime>
+        <ageCategory>F18-25</ageCategory>
+    </row>
+    <row>
+        <fullName>Willow Brock</fullName>
+        <distance>medium</distance>
+        <finishTime>3:04:30</finishTime>
+        <ageCategory>M18-25</ageCategory>
+    </row>
+    <row>
+        <fullName>Alissa Harris</fullName>
+        <distance>long</distance>
+        <finishTime>5:04:24</finishTime>
+        <ageCategory>F18-25</ageCategory>
+    </row>
+    <row>
+        <fullName>Dania Travis</fullName>
+        <distance>long</distance>
+        <finishTime>6:04:12</finishTime>
+        <ageCategory>F26-34</ageCategory>
+    </row>
+    <row>
+        <fullName>Lorena Villegas</fullName>
+        <distance>medium</distance>
+        <finishTime>2:09:31</finishTime>
+        <ageCategory>F26-34</ageCategory>
+    </row>
+    <row>
+        <fullName>Marc Rivera</fullName>
+        <distance>long</distance>
+        <finishTime>6:23:14</finishTime>
+        <ageCategory>M26-34</ageCategory>
+    </row>
+    <row>
+        <fullName>Ryan Roberts</fullName>
+        <distance>long</distance>
+        <finishTime>6:15:45</finishTime>
+        <ageCategory>M26-34</ageCategory>
+    </row>
+    <row>
+        <fullName>Sergio Spears</fullName>
+        <distance>medium</distance>
+        <finishTime>2:13:45</finishTime>
+        <ageCategory>M35-43</ageCategory>
+    </row>
+</root>

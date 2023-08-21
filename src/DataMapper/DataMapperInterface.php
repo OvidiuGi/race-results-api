@@ -8,5 +8,5 @@ use App\Entity\Race;
 
 interface DataMapperInterface
 {
-    public function mapRecord(Race &$race, array $record, int $rowNumber, array &$invalidRows): int;
+    public function mapRecord(Race &$race, array $record, int $rowNumber, array &$invalidRows): void;
 }

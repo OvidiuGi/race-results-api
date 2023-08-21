@@ -31,9 +31,8 @@ class CsvFileValidator extends AbstractFileValidator
                 'maxSize' => '1024k',
                 'mimeTypes' => [
                     'text/csv',
-                    'text/plain',
                 ],
-                'mimeTypesMessage' => 'Please upload a valid CSV document',
+                'mimeTypesMessage' => 'File Type Not Supported! Only CSV files are allowed',
             ]),
         ];
 

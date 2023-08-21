@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Validator;
 
+use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -33,7 +35,7 @@ abstract class AbstractFileValidator
                 ]
             );
 
-            throw new \InvalidArgumentException($violations->get(0)->getMessage());
+            throw new FileTypeNotSupported($violations->get(0)->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -53,8 +55,9 @@ abstract class AbstractFileValidator
             throw new \InvalidArgumentException(
                 sprintf(
                     'The header must contain the following fields: %s',
-                    implode(', ', $this->requiredFields)
-                )
+                    implode(', ', $this->requiredFields),
+                ),
+                Response::HTTP_BAD_REQUEST
             );
         }
     }
@@ -79,6 +82,7 @@ abstract class AbstractFileValidator
                     'rowNumber' => $rowNumber,
                 ]
             );
+
             return false;
         }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use _PHPStan_7c8075089\Nette\FileNotFoundException;
 use App\Dto\RaceDto;
 use App\Exception\DuplicateRaceException;
 use App\Importer\RaceResultsImporter;
@@ -32,7 +33,11 @@ class ImportAction extends AbstractController
     {
         $file = $request->files->get('file');
 
-        try {
+//        try {
+            if ($file === null) {
+                throw new FileNotFoundException(message: 'No file provided', code: Response::HTTP_BAD_REQUEST);
+            }
+
             $race = $this->raceRepository->findOneBy([
                 'title' => $raceDto->title,
                 'date' => $raceDto->date,
@@ -44,12 +49,16 @@ class ImportAction extends AbstractController
                     'date' => $race->getDate(),
                 ]);
 
-                throw new DuplicateRaceException($race->title, $race->getDate());
+                throw new DuplicateRaceException(
+                    title:$race->title,
+                    date: $race->getDate(),
+                    code: Response::HTTP_CONFLICT
+                );
             }
 
             return $this->raceResultsImporter->import(['file' => $file, 'raceDto' => $raceDto]);
-        } catch (\Exception $e) {
-            return new Response($e->getMessage(), Response::HTTP_BAD_REQUEST);
-        }
+//        } catch (\Exception $e) {
+//            return new Response(json_encode(['message' => $e->getMessage()]), $e->getCode());
+//        }
     }
 }

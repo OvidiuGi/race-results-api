@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\DataFixtures\Story\DefaultRaceStory;
+use App\DataFixtures\Story\DefaultResultStory;
 use App\Entity\Race;
 use App\Entity\Result;
 use App\Repository\RaceRepository;
@@ -21,39 +23,22 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        for ($i = 0; $i <= 10; $i++) {
-            $race = new Race();
-            $race->title = 'Race ' . $i;
-            $race->setDate(new \DateTimeImmutable());
+        DefaultRaceStory::load();
+        DefaultResultStory::load();
 
-            for ($j = 0; $j <= 10; $j++) {
-                $result = new Result();
-                $result->fullName = 'Runner ' . $j . ' Race ' . $i;
-                $result->distance = $j % 2 === 0 ? Result::DISTANCE_MEDIUM : Result::DISTANCE_LONG;
-                $result->ageCategory = $j % 2 === 0 ? 'M20-25' : 'F20-25';
-                $result->setFinishTime(new \DateTimeImmutable("+{$j} minutes"));
-                $result->setRace($race);
+        $races = $this->raceRepository->findAll();
 
-                $manager->persist($result);
-            }
-
-            $race->setAverageFinishLong(
-                $this->raceRepository->getAverageFinishTime(
-                    $race,
-                    Result::DISTANCE_LONG
-                )
-            );
+        /** @var Race $race */
+        foreach ($races as $race) {
             $race->setAverageFinishMedium(
-                $this->raceRepository->getAverageFinishTime(
-                    $race,
-                    Result::DISTANCE_MEDIUM
-                )
+                $this->raceRepository->getAverageFinishTime($race, Result::DISTANCE_MEDIUM)
             );
-
+            $race->setAverageFinishLong(
+                $this->raceRepository->getAverageFinishTime($race, Result::DISTANCE_LONG)
+            );
             $this->resultRepository->calculateOverallPlacements($race);
             $this->resultRepository->calculateAgeCategoryPlacements($race);
 
-            $manager->persist($race);
             $manager->flush();
         }
     }
