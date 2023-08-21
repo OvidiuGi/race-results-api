@@ -66,7 +66,7 @@ class RaceResultsImporter implements ImporterInterface
         $response = [
             'race' => $race,
             'message' => [
-                'status' => 'Successfully imported the objects',
+                'status' => 'Successfully imported the results',
                 'totalNumber' => $rowCount - 1,
                 'invalidRows' => count($invalidRows) > 0 ? implode(',', $invalidRows) : 'none',
             ]
