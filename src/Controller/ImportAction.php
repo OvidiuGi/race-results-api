@@ -33,7 +33,7 @@ class ImportAction extends AbstractController
     {
         $file = $request->files->get('file');
 
-//        try {
+        try {
             if ($file === null) {
                 throw new FileNotFoundException(message: 'No file provided', code: Response::HTTP_BAD_REQUEST);
             }
@@ -57,8 +57,8 @@ class ImportAction extends AbstractController
             }
 
             return $this->raceResultsImporter->import(['file' => $file, 'raceDto' => $raceDto]);
-//        } catch (\Exception $e) {
-//            return new Response(json_encode(['message' => $e->getMessage()]), $e->getCode());
-//        }
+        } catch (\Exception $e) {
+            return new Response(json_encode(['message' => $e->getMessage()]), $e->getCode());
+        }
     }
 }

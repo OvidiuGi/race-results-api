@@ -9,7 +9,6 @@ use Zenstruck\Foundry\Story;
 
 class DefaultRaceStory extends Story
 {
-
     public function build(): void
     {
         RaceFactory::createMany(10);

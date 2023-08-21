@@ -41,9 +41,4 @@ class RaceFactory extends ModelFactory
             'date' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime())
         ];
     }
-
-    public static function list(): void
-    {
-        parent::list();
-    }
 }
