@@ -26,4 +26,3 @@
 
 /phpstan.neon
 .phpunit.result.cache
-phpunit.xml.dist
