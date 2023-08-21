@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use _PHPStan_7c8075089\Nette\FileNotFoundException;
 use App\Dto\RaceDto;
+use App\Entity\Race;
 use App\Exception\DuplicateRaceException;
 use App\Importer\RaceResultsImporter;
 use App\Repository\RaceRepository;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Importer;
 
-use App\DataMapper\ResultDataMapper;
+use App\Handler\ResultHandler;
 use App\Entity\Race;
 use App\Entity\Result;
 use App\Repository\RaceRepository;
@@ -25,7 +25,7 @@ class RaceResultsImporter implements ImporterInterface
         private readonly ResultRepository $resultRepository,
         private readonly RaceRepository $raceRepository,
         private readonly CsvFileValidator $csvFileValidator,
-        private readonly ResultDataMapper $resultDataMapper,
+        private readonly ResultHandler $resultHandler,
         private readonly EntityManagerInterface $entityManager
     ) {
     }
@@ -46,11 +46,11 @@ class RaceResultsImporter implements ImporterInterface
         $race = Race::createFromDto($data['raceDto']);
         $this->raceRepository->save($race, true);
 
-        $rowCount = 0;
+        $rowCount = 1;
         $invalidRows = [];
 
         foreach ($file->getRecords() as $record) {
-            $this->resultDataMapper->mapRecord($race, $record, $rowCount, $invalidRows);
+            $this->resultHandler->handleRecord($race, $record, $rowCount, $invalidRows);
             $rowCount++;
         }
 
@@ -67,7 +67,7 @@ class RaceResultsImporter implements ImporterInterface
             'race' => $race,
             'message' => [
                 'status' => 'Successfully imported the objects',
-                'totalNumber' => $rowCount,
+                'totalNumber' => $rowCount - 1,
                 'invalidRows' => count($invalidRows) > 0 ? implode(',', $invalidRows) : 'none',
             ]
         ];

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Api;
+namespace App\Tests\Functional\Entity;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\DataFixtures\Factory\ResultFactory;

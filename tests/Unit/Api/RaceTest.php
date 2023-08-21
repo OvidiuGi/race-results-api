@@ -4,9 +4,9 @@ namespace App\Tests\Unit\Api;
 
 use App\Dto\RaceDto;
 use App\Entity\Race;
-use Monolog\Test\TestCase;
+use PHPUnit\Framework\TestCase;
 
-class RacesTest extends TestCase
+class RaceTest extends TestCase
 {
     public function testCreateFromDto(): void
     {

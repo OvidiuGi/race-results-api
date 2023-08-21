@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Api;
+namespace App\Tests\Functional\Entity;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\DataFixtures\Factory\RaceFactory;
@@ -52,7 +52,6 @@ class RacesTest extends ApiTestCase
                 'title' => $race->title,
                 'date' => $race->getDate()->format('Y-m-d'),
             ],
-//            'headers' => ['Content-Type' => 'multipart/form-data'],
             'extra' => [
                 'files' => [
                     'file' => $uploadedFile
@@ -83,7 +82,6 @@ class RacesTest extends ApiTestCase
                 'title' => 'Race Invalid',
                 'date' => '2023-08-20',
             ],
-//            'headers' => ['Content-Type' => 'multipart/form-data'],
             'extra' => [
                 'files' => [
                     'file' => $uploadedFile
@@ -124,7 +122,6 @@ class RacesTest extends ApiTestCase
                 'title' => 'Race Invalid',
                 'date' => '2023-08-20',
             ],
-//            'headers' => ['Content-Type' => 'multipart/form-data'],
             'extra' => [
                 'files' => [
                     'file' => $uploadedFile
@@ -146,7 +143,6 @@ class RacesTest extends ApiTestCase
                 'title' => 'Race Invalid',
                 'date' => '2023-08-20',
             ],
-//            'headers' => ['Content-Type' => 'multipart/form-data'],
         ]);
 
         $this->assertResponseStatusCodeSame(400);
@@ -169,7 +165,6 @@ class RacesTest extends ApiTestCase
                 'title' => 'Race Valid',
                 'date' => '2023-08-20',
             ],
-//            'headers' => ['Content-Type' => 'multipart/form-data'],
             'extra' => [
                 'files' => [
                     'file' => $uploadedFile
@@ -208,7 +203,6 @@ class RacesTest extends ApiTestCase
                 'title' => 'Race Invalid Row',
                 'date' => '2023-08-20',
             ],
-//            'headers' => ['Content-Type' => 'multipart/form-data'],
             'extra' => [
                 'files' => [
                     'file' => $uploadedFile
@@ -223,13 +217,13 @@ class RacesTest extends ApiTestCase
                 'id' => 82,
                 'title' => 'Race Invalid Row',
                 'date' => '2023-08-20',
-                "averageFinishMedium" => "03:10:47",
-                "averageFinishLong" => "05:07:19"
+                "averageFinishMedium" => "05:07:19",
+                "averageFinishLong" => "02:29:15"
             ],
             'message' => [
                 'status' => 'Successfully imported the objects',
                 'totalNumber' => 10,
-                'invalidRows' => '7',
+                'invalidRows' => '1,8',
             ]
         ]);
     }

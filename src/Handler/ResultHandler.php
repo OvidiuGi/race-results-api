@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\DataMapper;
+namespace App\Handler;
 
 use App\Entity\Race;
 use App\Entity\Result;
 use App\Repository\RaceRepository;
 use App\Repository\ResultRepository;
 use App\Validator\Csv\CsvFileValidator;
+use Doctrine\DBAL\Exception;
 
-class ResultDataMapper implements DataMapperInterface
+class ResultHandler implements HandlerInterface
 {
     public function __construct(
         private readonly int $batchSize,
@@ -20,7 +21,10 @@ class ResultDataMapper implements DataMapperInterface
     ) {
     }
 
-    public function mapRecord(Race &$race, array $record, int $rowNumber, array &$invalidRows): void
+    /**
+     * @throws Exception
+     */
+    public function handleRecord(Race &$race, array $record, int $rowNumber, array &$invalidRows): void
     {
         if (!$this->csvFileValidator->validateRow($record, $rowNumber)) {
             $invalidRows[] = $rowNumber;
