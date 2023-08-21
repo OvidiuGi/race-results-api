@@ -183,7 +183,7 @@ class RacesTest extends ApiTestCase
                 "averageFinishLong" => "05:19:58"
             ],
             'message' => [
-                'status' => 'Successfully imported the objects',
+                'status' => 'Successfully imported the results',
                 'totalNumber' => 10,
                 'invalidRows' => 'none',
             ]
@@ -221,7 +221,7 @@ class RacesTest extends ApiTestCase
                 "averageFinishLong" => "02:29:15"
             ],
             'message' => [
-                'status' => 'Successfully imported the objects',
+                'status' => 'Successfully imported the results',
                 'totalNumber' => 10,
                 'invalidRows' => '1,8',
             ]

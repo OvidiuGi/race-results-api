@@ -23,6 +23,11 @@ class ResultUpdatedListener
     public function postUpdate(Result $result, PostUpdateEventArgs $event): void
     {
         if ($result->distance !== Result::DISTANCE_LONG) {
+            $result->overallPlacement = null;
+            $result->ageCategoryPlacement = null;
+            $objectManager = $event->getObjectManager();
+            $objectManager->flush();
+
             return;
         }
 
@@ -68,6 +73,10 @@ class ResultUpdatedListener
 
     private function compareOverall(Result $current): bool
     {
+        if ($current->overallPlacement === null) {
+            return true;
+        }
+
         $previous = $this->resultRepository->findOneBy([
             'overallPlacement' => $current->overallPlacement - 1,
         ]);
@@ -89,6 +98,10 @@ class ResultUpdatedListener
 
     private function compareAgeCategory(Result $current): bool
     {
+        if ($current->ageCategoryPlacement === null) {
+            return true;
+        }
+
         $previous = $this->resultRepository->findOneBy([
             'ageCategoryPlacement' => $current->ageCategoryPlacement - 1,
             'ageCategory' => $current->ageCategory

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Repository;
 
 use App\Entity\Race;
-use App\Entity\Result;
 use App\Repository\RaceRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;

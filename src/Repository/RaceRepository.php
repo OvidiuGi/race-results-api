@@ -27,6 +27,9 @@ class RaceRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getAverageFinishTime(Race $race, string $distance): ?\DateTimeImmutable
     {
         $connection = $this->entityManager->getConnection();
