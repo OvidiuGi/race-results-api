@@ -10,6 +10,7 @@ use App\Importer\RaceResultsImporter;
 use App\Repository\RaceRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -33,6 +34,10 @@ class ImportAction extends AbstractController
         $file = $request->files->get('file');
 
         try {
+            if ($file === null) {
+                throw new FileNotFoundException(message: 'No file provided', code: Response::HTTP_BAD_REQUEST);
+            }
+
             $race = $this->raceRepository->findOneBy([
                 'title' => $raceDto->title,
                 'date' => $raceDto->date,
@@ -44,12 +49,16 @@ class ImportAction extends AbstractController
                     'date' => $race->getDate(),
                 ]);
 
-                throw new DuplicateRaceException($race->title, $race->getDate());
+                throw new DuplicateRaceException(
+                    title:$race->title,
+                    date: $race->getDate(),
+                    code: Response::HTTP_CONFLICT
+                );
             }
 
             return $this->raceResultsImporter->import(['file' => $file, 'raceDto' => $raceDto]);
         } catch (\Exception $e) {
-            return new Response($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return new Response(json_encode(['message' => $e->getMessage()]), $e->getCode());
         }
     }
 }

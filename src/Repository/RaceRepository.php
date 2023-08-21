@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\RaceDto;
 use App\Entity\Race;
-use App\Entity\Result;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -30,6 +27,9 @@ class RaceRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getAverageFinishTime(Race $race, string $distance): ?\DateTimeImmutable
     {
         $connection = $this->entityManager->getConnection();

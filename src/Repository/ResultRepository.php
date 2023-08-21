@@ -27,15 +27,15 @@ class ResultRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function flushAndClear(): void
     {
         $this->entityManager->flush();
         $this->entityManager->clear();
     }
 
+    /**
+     * @throws Exception
+     */
     public function calculateOverallPlacements(Race $race): void
     {
         $connection = $this->entityManager->getConnection();
